@@ -13,3 +13,7 @@ def fetchdata():
     df = pd.read_csv('testms.csv') 
     data = df.to_json()
     return json.dumps({"data":data})
+
+@app.route('/test')
+def test():
+    return "hello"
