@@ -16,7 +16,10 @@ def fetchdata():
     for i,j in df.iterrows():
         item = {}
         for index,val in enumerate(j):
-            item[keys[index]]=val
+            if pd.isna(val):
+                item[keys[index]]=str(val)
+            else:
+                item[keys[index]]=val
         data.append(item)
     return json.dumps({"data":data})
 
@@ -24,7 +27,7 @@ def fetchdata():
 def test():
     return "hello"
 
-@app.route('/predict')
+@app.route('/predict',methods=['POST'])
 def predict():
     with open('model.obj','rb') as fp:
         model = pickle.load(fp)
@@ -35,7 +38,14 @@ def predict():
        'mental_health_interview', 'phys_health_interview',
        'mental_vs_physical', 'obs_consequence']
         input=[]
+        keys=[]
         for i in to_extract:
             input.append(data[i])
+            keys.append(i)
+        
+        df = pd.DataFrame([input],columns=keys)
+
+
+
         result = model.predict(input)
         return str(result)
