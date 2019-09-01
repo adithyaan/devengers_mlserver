@@ -47,10 +47,10 @@ def predict():
         test = pd.DataFrame([input],columns=keys)
 
         # temp = test.Age
-        # temp = temp.replace(to_replace=-1,value=22)
+        test['work_interfere'] = test['work_interfere'].replace(to_replace="nan",value="Maybe")
         # test.Age = temp
 
-        test['work_interfere']=test['work_interfere'].fillna("Maybe")
+        # test['work_interfere']=test['work_interfere'].fillna("Maybe")
         # test['self_employed']=test['self_employed'].fillna("Dont Know")
 
         temp = test.Gender
@@ -58,11 +58,12 @@ def predict():
         temp = temp.replace(to_replace=["female","F","Female","Woman","femail","f"],value='F')
         temp = temp.replace(to_replace=["p","Female (trans)","ostensibly male, unsure what that really means"],value='T')
         test.Gender = temp
-
-        le = preprocessing.LabelEncoder()
-        test = test.apply(le.fit_transform) 
+        with open('dict.obj',"rb") as fp:
+            d = pickle.load(fp)
+            test = test.apply(lambda x: d[x.name].transform(x)) 
         
-
         result = model.predict(test)
-        result = 'Yes' if result==0 else 'No'
+        print(result)
+        result = 'Yes' if result[0]==0 else 'No'
+        print(result)
         return {"data":result}
